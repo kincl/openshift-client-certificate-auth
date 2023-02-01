@@ -40,14 +40,12 @@ authentication.
 In this example, we will use the [OpenShift Service CA](https://docs.openshift.com/container-platform/4.11/security/certificates/service-serving-certificate.html)
 to authenticate the Client Certificate Service to the OpenShift Cluster OAuth service
 
-## Client Certificate Service
+## Deploy the Client Certificate Service
 
 We will use Nginx for doing the work of validating the client certificates but
 we could also use any number of other solutions including Apache HTTPd.
 
-### Deploy
-
-#### Deploy Client Certificate Service
+### Deploy Client Certificate Service
 
 Clone this git repository and add the client certificate CA as `ca.pem`
 
@@ -63,7 +61,7 @@ Apply the configuration
 $ oc apply -k .
 ```
 
-#### Update OpenShift Cluster OAuth Configuration
+### Update OpenShift Cluster OAuth Configuration
 
 The OAuth service requires that the backend CA certificate have a specific key
 so we need to copy the service-ca.crt into it:
@@ -72,7 +70,6 @@ so we need to copy the service-ca.crt into it:
 $ oc get cm openshift-service-ca.crt -o jsonpath='{.data.service-ca\.crt}' > ca.crt
 $ oc create cm client-certificate-auth-ca -n openshift-config --from-file=ca.crt
 ```
-
 
 Get the full URL to our client certificate service:
 
@@ -100,9 +97,22 @@ spec:
         name: client-certificate-auth-ca
 ```
 
-### Other Configuration
+**DONE!**
 
-#### Frontend TLS Certificates
+We have deployed the client certificate service, you should be able to
+log into the console and be presented with a request to use mutual TLS.
+
+## Debugging
+
+First look at the Client Certificate Service logs for the auth deployment:
+
+```
+$ oc logs -l app.kubernetes.io/name=client-certificate-auth --prefix
+```
+
+## Other Configuration
+
+### Frontend TLS Certificates
 
 By default, the service will deploy using the backend certificates for the frontend.
 If we have a new certificate and key we need to first go into the client:
@@ -139,7 +149,7 @@ server {
 $ oc apply -k .
 ```
 
-#### Fallback Basic Auth with htpasswd
+### Fallback Basic Auth with htpasswd
 
 With this authentication module we cannot use other types of authentication in OpenShift
 but we can implement any kind of authentication that is available in our service based
