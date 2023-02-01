@@ -1,0 +1,21 @@
+resources:
+- namespace.yaml
+- service.yaml
+- deployment.yaml
+- route.yaml
+- imagestream.yaml
+
+commonLabels:
+  app.kubernetes.io/name: client-certificate-auth
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+namespace: client-certificate-auth
+
+configMapGenerator:
+- name: client-certificate-auth-config
+  files:
+  - nginx/frontend.conf
+  - nginx/healthz.conf
+  - ca.pem

@@ -1,0 +1,13 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: auth
+spec:
+  to:
+    kind: Service
+    name: auth
+    weight: 100
+  port:
+    targetPort: https
+  tls:
+    termination: passthrough

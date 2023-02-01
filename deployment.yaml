@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-certificate-auth
+  namespace: client-certificate-auth
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: deployment
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: deployment
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: client-certificate-auth
+            topologyKey: kubernetes.io/hostname
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - effect: NoExecute
+        key: node.kubernetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 120
+      - effect: NoExecute
+        key: node.kubernetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 120
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      priorityClassName: system-cluster-critical
+      containers:
+      - image: image-registry.openshift-image-registry.svc:5000/client-certificate-auth/nginx:latest
+        name: nginx
+        resources:
+          requests:
+            cpu: 100m
+            memory: 32Mi
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+        args:
+          - nginx
+          - -g
+          - daemon off;
+        volumeMounts:
+          - name: config
+            mountPath: /opt/app-root/etc/nginx.d/frontend.conf
+            subPath: frontend.conf
+          - name: config
+            mountPath: /opt/app-root/etc/nginx.default.d/healthz.conf
+            subPath: healthz.conf
+
+          - name: config
+            mountPath: /opt/app-root/etc/ca.pem
+            subPath: ca.pem
+
+          - name: server-cert
+            mountPath: /opt/app-root/etc/server-cert
+
+          - name: htpasswd
+            mountPath: /opt/app-root/etc/htpasswd
+            subPath: htpasswd
+
+          - name: frontend
+            mountPath: /opt/app-root/etc/frontend-cert
+
+      volumes:
+      - name: config
+        configMap:
+          name: client-certificate-auth-config
+
+      - name: server-cert
+        secret:
+          secretName: client-certificate-auth-cert
+
+      - name: htpasswd
+        secret:
+          secretName: client-certificate-auth-htpasswd
+          optional: true
+
+      - name: frontend
+        secret:
+          secretName: client-certificate-auth-frontend
+          optional: true
