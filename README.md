@@ -45,8 +45,6 @@ to authenticate the Client Certificate Service to the OpenShift Cluster OAuth se
 We will use Nginx for doing the work of validating the client certificates but
 we could also use any number of other solutions including Apache HTTPd.
 
-### Deploy Client Certificate Service
-
 Clone this git repository and add the client certificate CA as `ca.pem`
 
 ```bash
