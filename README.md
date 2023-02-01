@@ -47,6 +47,8 @@ we could also use any number of other solutions including Apache HTTPd.
 
 ### Deploy
 
+#### Deploy Client Certificate Service
+
 Clone this git repository and add the client certificate CA as `ca.pem`
 
 ```bash
@@ -61,7 +63,44 @@ Apply the configuration
 $ oc apply -k .
 ```
 
-### Configuration
+#### Update OpenShift Cluster OAuth Configuration
+
+The OAuth service requires that the backend CA certificate have a specific key
+so we need to copy the service-ca.crt into it:
+
+```
+$ oc get cm openshift-service-ca.crt -o jsonpath='{.data.service-ca\.crt}' > ca.crt
+$ oc create cm client-certificate-auth-ca -n openshift-config --from-file=ca.crt
+```
+
+
+Get the full URL to our client certificate service:
+
+```
+$ oc get route
+```
+
+Update the OAuth configuration and replace `<route URL>` with that URL
+
+```yaml
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+  - name: requestheaderidp
+    type: RequestHeader
+    requestHeader:
+      loginURL: https://<route URL>/login-proxy/oauth/authorize?${query}
+      challengeURL: https://<route URL>/challenging-proxy/oauth/authorize?${query}
+      headers:
+      - X-Remote-User
+      ca:
+        name: client-certificate-auth-ca
+```
+
+### Other Configuration
 
 #### Frontend TLS Certificates
 
