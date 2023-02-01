@@ -1,6 +1,7 @@
 # Client Certificate Authentication for OpenShift
 
-This uses Request Header authentication and extends OpenShift to support TLS client certificates. Here is the full authentication sequence diagram:
+This uses [Request Header authentication](https://docs.openshift.com/container-platform/4.11/authentication/identity_providers/configuring-request-header-identity-provider.html) and extends OpenShift to support TLS client
+certificates. Here is the full authentication sequence diagram:
 
 ```mermaid
 sequenceDiagram
@@ -93,6 +94,8 @@ spec:
       - X-Remote-User
       ca:
         name: client-certificate-auth-ca
+      clientCommonNames: 
+      - auth.client-certificate-auth.svc
 ```
 
 **DONE!**
