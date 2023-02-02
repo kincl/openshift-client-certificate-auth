@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ca
+  namespace: client-certificate-auth
+spec:
+  isCA: true
+  commonName: client-certificate-auth-ca
+  secretName: ca-secret
+  duration: 43800h # 5y
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

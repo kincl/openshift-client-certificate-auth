@@ -1,0 +1,5 @@
+resources:
+- clusterissuer.yaml
+- issuer.yaml
+- ca-certificate.yaml
+- backend-certificate.yaml

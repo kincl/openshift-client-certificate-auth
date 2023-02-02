@@ -38,8 +38,22 @@ authentication.
 
 ### Backend
 
-In this example, we will use the [OpenShift Service CA](https://docs.openshift.com/container-platform/4.11/security/certificates/service-serving-certificate.html)
-to authenticate the Client Certificate Service to the OpenShift Cluster OAuth service
+We need a small PKI infrastructure for the backend service authentication from our client
+certificate authentication service to the OpenShift Cluster OAuth service.
+
+> :memo: Note: We are unable to use certificates from the OpenShift Service CA because
+> the certificates are not signed to allow for client authentication which is required
+> for our backend service.
+
+#### Preferred: Using cert-manager Operator
+
+1. Install cert-manager operator from Operator Catalog in OpenShift Console
+
+2. Configure
+
+```
+$ oc apply -k cert-manager/
+```
 
 ## Deploy the Client Certificate Service
 
@@ -62,11 +76,11 @@ $ oc apply -k .
 
 ### Update OpenShift Cluster OAuth Configuration
 
-The OAuth service requires that the backend CA certificate have a specific key
-so we need to copy the service-ca.crt into it:
+The OAuth service requires that the backend CA certificate exist in the openshift-config
+namespace so copy it over:
 
 ```
-$ oc get cm openshift-service-ca.crt -o jsonpath='{.data.service-ca\.crt}' > ca.crt
+$ oc get secret ca-secret -o go-template='{{index .data "ca.crt" | base64decode}}' > ca.crt
 $ oc create cm client-certificate-auth-ca -n openshift-config --from-file=ca.crt
 ```
 
@@ -122,32 +136,25 @@ If we have a new certificate and key we need to first go into the client:
 $ oc project client-certificate-auth
 ```
 
-1. Add it as a secret
+1. Remove the service CA annotation
+
+```
+$ oc annotate service auth service.beta.openshift.io/serving-cert-secret-name-
+```
+
+2. Add the certificate as a secret
 
 ```
 $ oc create secret tls \
-    client-certificate-auth-frontend \
+    client-certificate-auth-cert \
     --cert=path/to/server.pem \
     --key=path/to/server-key.pem
 ```
 
-2. Update the nginx config file `nginx/frontend.conf`:
-
-```diff
-server {
-...
--    ssl_certificate        /opt/app-root/etc/server-cert/tls.crt;
--    ssl_certificate_key    /opt/app-root/etc/server-cert/tls.key;
-+    ssl_certificate        /opt/app-root/etc/frontend-cert/tls.crt;
-+    ssl_certificate_key    /opt/app-root/etc/frontend-cert/tls.key;
-...
-}
-```
-
-3. Apply the new configuration
+3. Restart the deployment
 
 ```
-$ oc apply -k .
+$ oc rollout restart deploy/client-certificate-auth
 ```
 
 ### Fallback Basic Auth with htpasswd

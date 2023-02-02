@@ -63,36 +63,34 @@ spec:
           - name: config
             mountPath: /opt/app-root/etc/nginx.default.d/healthz.conf
             subPath: healthz.conf
-
           - name: config
             mountPath: /opt/app-root/etc/ca.pem
             subPath: ca.pem
 
-          - name: server-cert
+          - name: frontend-cert
             mountPath: /opt/app-root/etc/server-cert
+
+          - name: backend-cert
+            mountPath: /opt/app-root/etc/backend-cert
 
           - name: htpasswd
             mountPath: /opt/app-root/etc/htpasswd
             subPath: htpasswd
-
-          - name: frontend
-            mountPath: /opt/app-root/etc/frontend-cert
 
       volumes:
       - name: config
         configMap:
           name: client-certificate-auth-config
 
-      - name: server-cert
+      - name: frontend-cert
         secret:
           secretName: client-certificate-auth-cert
+
+      - name: backend-cert
+        secret:
+          secretName: backend-cert
 
       - name: htpasswd
         secret:
           secretName: client-certificate-auth-htpasswd
-          optional: true
-
-      - name: frontend
-        secret:
-          secretName: client-certificate-auth-frontend
           optional: true
