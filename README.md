@@ -19,6 +19,43 @@ sequenceDiagram
     console->>User: logged in
 ```
 
+## Request Header Authentication Details
+
+Request Header authentication in OpenShift can be thought of as the "auth of last resort"
+because of it's extreme flexibility in how you can handle authentication requests in
+OpenShift but with that flexiblity comes some complexity.
+
+Unlike the other authentication identity providers offered in OpenShift, Request Header
+does not actually handle the user authentication request directly and instead passes all
+requests to a user-deployed service that handles the authentication and then proxies the
+request to OpenShift's OAuth service to get a authentication token for the user.
+
+### OpenShift Authentication **without** Request Header
+
+```mermaid
+flowchart LR
+  user((User))
+  console[OpenShift Console]
+  oauth[OpenShift Cluster OAuth]
+  user-->console-->oauth-->user
+```
+
+### OpenShift Authentication **with** Request Header
+
+```mermaid
+flowchart LR
+  user((User))
+  console[OpenShift Console]
+  oauth[OpenShift Cluster OAuth]
+  service([User-deployed Auth Service])
+  user-->console-->service-->oauth-->service
+  service-->user
+```
+
+This is why we are unable to use other identity providers such as HTPasswd/Keystone/LDAP/Basic Auth
+with Request Header because all authentication requests are forwarded to the custom authentication
+service.
+
 ## Required Certificates
 
 We need a number of certificates in order to make this work, lets enumerate all
