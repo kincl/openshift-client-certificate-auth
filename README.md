@@ -49,7 +49,10 @@ flowchart LR
   oauth[OpenShift Cluster OAuth]
   service[[User-deployed Auth Service]] 
   style service fill:lightyellow,stroke-dasharray: 5 5
-  user-->console-->service-->oauth-->service
+  user-->console
+  console-- Frontend Certificate -->service
+  service-- Backend Certificate -->oauth
+  oauth-->service
   service-->user
 ```
 
