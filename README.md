@@ -50,8 +50,8 @@ flowchart LR
   service[[User-deployed Auth Service]] 
   style service fill:lightyellow,stroke-dasharray: 5 5
   user-->console
-  console-- Frontend Certificate -->service
-  service-- Backend Certificate -->oauth
+  console-- Frontend\nCertificate -->service
+  service-- Backend\nCertificate -->oauth
   oauth-->service
   service-->user
 ```
