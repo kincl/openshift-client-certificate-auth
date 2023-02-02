@@ -157,7 +157,7 @@ $ oc create secret tls \
     --key=path/to/server-key.pem
 ```
 
-3. Restart the deployment
+4. Restart the deployment
 
 ```
 $ oc rollout restart deploy/client-certificate-auth
