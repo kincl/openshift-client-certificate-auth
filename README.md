@@ -37,7 +37,10 @@ flowchart LR
   user((User))
   console[OpenShift Console]
   oauth[OpenShift Cluster OAuth]
-  user-->console-->oauth-->user
+  user-->console
+  console-- Auth redirect -->user
+  user-->oauth
+  oauth-->user
 ```
 
 ### OpenShift Authentication **with** Request Header
@@ -50,7 +53,8 @@ flowchart LR
   service[[User-deployed Auth Service]] 
   style service fill:lightyellow,stroke-dasharray: 5 5
   user-->console
-  console-- Frontend\nCertificate -->service
+  console-- Auth redirect -->user
+  user-- Frontend\nCertificate -->service
   service-- Backend\nCertificate -->oauth
   oauth-->service
   service-->user
