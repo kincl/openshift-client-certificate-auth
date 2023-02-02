@@ -47,7 +47,8 @@ flowchart LR
   user((User))
   console[OpenShift Console]
   oauth[OpenShift Cluster OAuth]
-  service([User-deployed Auth Service])
+  service[[User-deployed Auth Service]] 
+  style service fill:lightyellow,stroke-dasharray: 5 5
   user-->console-->service-->oauth-->service
   service-->user
 ```
