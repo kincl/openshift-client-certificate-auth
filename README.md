@@ -142,7 +142,13 @@ $ oc project client-certificate-auth
 $ oc annotate service auth service.beta.openshift.io/serving-cert-secret-name-
 ```
 
-2. Add the certificate as a secret
+2. Delete the old certificate secret
+
+```
+$ oc delete secret client-certificate-auth-cert
+```
+
+3. Add the certificate as a secret
 
 ```
 $ oc create secret tls \
