@@ -7,8 +7,8 @@ certificates. Here is the full authentication sequence diagram:
 sequenceDiagram
     actor User
     participant console as OpenShift Console
-    participant oauth as OpenShift Cluster OAuth
-    participant mtls-proxy as Client Certificate Service
+    participant oauth as OpenShift OAuth Service
+    participant mtls-proxy as Client Certificate Service (Nginx)
     User->>console: start
     console->>oauth: redirect for auth
     oauth->>mtls-proxy: redirect for auth
@@ -36,7 +36,7 @@ request to OpenShift's OAuth service to get a authentication token for the user.
 flowchart LR
   user((User))
   console[OpenShift Console]
-  oauth[OpenShift Cluster OAuth]
+  oauth[OpenShift OAuth Service]
   user-->console
   console-- Auth redirect -->user
   user-->oauth
@@ -49,7 +49,7 @@ flowchart LR
 flowchart LR
   user((User))
   console[OpenShift Console]
-  oauth[OpenShift Cluster OAuth]
+  oauth[OpenShift OAuth Service]
   service[[User-deployed Auth Service]] 
   style service fill:lightyellow,stroke-dasharray: 5 5
   user-->console
