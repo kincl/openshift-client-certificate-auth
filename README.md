@@ -103,7 +103,7 @@ $ oc apply -k cert-manager/
 3. Obtain the CA PEM from cert-manager
 
 ```
-# oc extract -n client-certificate-auth secret/ca-secret --to=ca.pem --keys=tls.crt
+$ oc extract -n client-certificate-auth secret/ca-secret --to=ca.pem --keys=tls.crt
 ```
 
 #### Option 2: Existing PKI infrastructure
