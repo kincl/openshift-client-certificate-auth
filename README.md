@@ -90,7 +90,7 @@ certificate authentication service to the OpenShift Cluster OAuth service.
 > the certificates are not signed to allow for client authentication which is required
 > for our backend service.
 
-#### Preferred: Using cert-manager Operator
+#### Option 1: Using cert-manager Operator
 
 1. Install cert-manager operator from Operator Catalog in OpenShift Console
 
@@ -99,6 +99,16 @@ certificate authentication service to the OpenShift Cluster OAuth service.
 ```
 $ oc apply -k cert-manager/
 ```
+
+3. Obtain the CA PEM from cert-manager
+
+```
+# oc extract -n client-certificate-auth secret/ca-secret --to=ca.pem --keys=tls.crt
+```
+
+#### Option 2: Existing PKI infrastructure
+
+We need the CA in PEM format for the next steps.
 
 ## Deploy the Client Certificate Service
 
